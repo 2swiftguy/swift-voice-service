@@ -14,9 +14,9 @@ def build_initial_twiml(payload: dict) -> str:
         f'  <Gather input="speech dtmf" action="/transcribe" method="POST" speechTimeout="auto"'
         + (f' partialResultCallback="{partial_cb}" partialResultCallbackMethod="POST"' if partial_cb else '')
         + ' bargeIn="true">',
-        '    <Say voice="alice">Welcome to SWIFT Voice. You can interrupt me at any time. What do you need?</Say>',
+        '    <Say voice="Polly.Matthew">Welcome to SWIFT Voice. You can interrupt me at any time. What do you need?</Say>',
         '  </Gather>',
-        '  <Say voice="alice">I did not catch that. Goodbye.</Say>',
+        '  <Say voice="Polly.Matthew">I did not catch that. Goodbye.</Say>',
         '</Response>'
     ]
     return "\n".join(parts)
@@ -26,7 +26,7 @@ def build_transcribe_twiml(payload: dict) -> str:
     resp = [
         '<?xml version="1.0" encoding="UTF-8"?>',
         '<Response>',
-        f'  <Say voice="alice">You said: {text}</Say>',
+        f'  <Say voice="Polly.Matthew">You said: {text}</Say>',
         '  <Hangup/>',
         '</Response>'
     ]
