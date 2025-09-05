@@ -24,7 +24,7 @@ def build_initial_twiml(payload: dict) -> str:
 
     gather = response.gather(**gather_kwargs)
     gather.say(
-        "Welcome to SWIFT Voice. You can interrupt me at any time. What do you need?",
+        "Welcome to SWIFT Python. You can interrupt me at any time. What do you need?",
         voice="Polly.Matthew",
     )
     response.say("I did not catch that. Goodbye.", voice="Polly.Matthew")

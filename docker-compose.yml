@@ -1,5 +1,6 @@
 services:
-  voice:
+  swift-python-service:
+    container_name: swift-python-service
     build: .
     working_dir: /app
     command: uvicorn main:app --host 0.0.0.0 --port 8001 --reload
@@ -9,3 +10,4 @@ services:
     ports:
       - "127.0.0.1:8001:8001"
     restart: unless-stopped
+
