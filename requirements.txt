@@ -7,3 +7,4 @@ httpx
 twilio
 redis
 structlog
+faster-whisper
