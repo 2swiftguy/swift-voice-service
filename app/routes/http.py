@@ -3,6 +3,7 @@ from fastapi.responses import Response, JSONResponse
 from app.core.settings import settings
 from app.models.call import CallPayload
 from app.services.call_flow import build_initial_twiml, build_transcribe_twiml
+from app.services.transcription import transcribe_audio
 
 router = APIRouter()
 
@@ -22,7 +23,16 @@ def process_call(payload: CallPayload, x_service_token: str | None = Header(None
 @router.post("/transcribe")
 async def transcribe(request: Request):
     form = await request.form()
-    twiml = build_transcribe_twiml(dict(form))
+
+    # Prefer transcribing any uploaded audio ourselves using an in-memory buffer
+    # rather than persisting to a temporary file on disk.
+    audio = form.get("audio")
+    text = form.get("SpeechResult") or ""
+    if audio is not None:
+        data = await audio.read() if hasattr(audio, "read") else audio
+        text = transcribe_audio(data)
+
+    twiml = build_transcribe_twiml({"SpeechResult": text})
     return Response(content=twiml, media_type="application/xml")
 
 @router.post("/partial")
