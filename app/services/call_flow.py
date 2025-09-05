@@ -1,33 +1,39 @@
 from app.core.settings import settings
 from app.services.state import set_state
+from twilio.twiml.voice_response import VoiceResponse
+
 
 def build_initial_twiml(payload: dict) -> str:
     sid = payload.get("CallSid") or ""
     set_state(sid, stage="gather")
 
     base = settings.PUBLIC_BASE_URL or ""
-    partial_cb = f'{base}/partial' if base else ""
+    partial_cb = f"{base}/partial" if base else ""
 
-    parts = [
-        '<?xml version="1.0" encoding="UTF-8"?>',
-        '<Response>',
-        f'  <Gather input="speech dtmf" action="/transcribe" method="POST" speechTimeout="auto"'
-        + (f' partialResultCallback="{partial_cb}" partialResultCallbackMethod="POST"' if partial_cb else '')
-        + ' bargeIn="true">',
-        '    <Say voice="Polly.Matthew">Welcome to SWIFT Voice. You can interrupt me at any time. What do you need?</Say>',
-        '  </Gather>',
-        '  <Say voice="Polly.Matthew">I did not catch that. Goodbye.</Say>',
-        '</Response>'
-    ]
-    return "\n".join(parts)
+    response = VoiceResponse()
+    gather_kwargs = {
+        "input": "speech dtmf",
+        "action": "/transcribe",
+        "method": "POST",
+        "speech_timeout": "auto",
+        "barge_in": True,
+    }
+    if partial_cb:
+        gather_kwargs["partial_result_callback"] = partial_cb
+        gather_kwargs["partial_result_callback_method"] = "POST"
+
+    gather = response.gather(**gather_kwargs)
+    gather.say(
+        "Welcome to SWIFT Voice. You can interrupt me at any time. What do you need?",
+        voice="Polly.Matthew",
+    )
+    response.say("I did not catch that. Goodbye.", voice="Polly.Matthew")
+    return str(response)
+
 
 def build_transcribe_twiml(payload: dict) -> str:
     text = payload.get("SpeechResult") or ""
-    resp = [
-        '<?xml version="1.0" encoding="UTF-8"?>',
-        '<Response>',
-        f'  <Say voice="Polly.Matthew">You said: {text}</Say>',
-        '  <Hangup/>',
-        '</Response>'
-    ]
-    return "\n".join(resp)
+    response = VoiceResponse()
+    response.say(f"You said: {text}", voice="Polly.Matthew")
+    response.hangup()
+    return str(response)
