@@ -4,6 +4,10 @@ pydantic
 pydantic-settings
 python-dotenv
 httpx
-twilio
 redis
 structlog
+
+faster-whisper
+
+twilio>=8.0.0
+
