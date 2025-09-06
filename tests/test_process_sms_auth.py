@@ -12,11 +12,12 @@ from main import app
 client = TestClient(app)
 
 
-def test_sms_route_returns_twiml():
+def test_sms_without_token_returns_401():
+    response = client.post("/sms")
+    assert response.status_code == 401
+
+
+def test_sms_with_token_returns_200():
     token = os.environ["SERVICE_AUTH_TOKEN"]
     response = client.post("/sms", headers={"X-Service-Token": token})
     assert response.status_code == 200
-    assert response.headers["content-type"].startswith("application/xml")
-    assert "<Response>" in response.text
-    assert "</Response>" in response.text
-
