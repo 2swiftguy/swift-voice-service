@@ -8,6 +8,6 @@ class Settings(BaseSettings):
     ENV: str = "local"
     PUBLIC_BASE_URL: str | None = None
 
-    model_config = SettingsConfigDict(env_file=".env.local.local", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(env_file=".env.local", env_file_encoding="utf-8")
 
 settings = Settings()
