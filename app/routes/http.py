@@ -39,13 +39,8 @@ def process_call(payload: CallPayload, x_service_token: str | None = Header(None
 
 
 @router.post("/transcribe")
-
 async def transcribe(request: Request) -> Response:
     form = await validate_twilio_request(request)
-    twiml = build_transcribe_twiml(form)
-
-async def transcribe(request: Request):
-    form = await request.form()
 
     # Prefer transcribing any uploaded audio ourselves using an in-memory buffer
     # rather than persisting to a temporary file on disk.
