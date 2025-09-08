@@ -10,4 +10,5 @@ structlog
 faster-whisper
 
 twilio>=8.0.0
+python-multipart
 

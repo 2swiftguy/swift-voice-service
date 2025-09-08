@@ -13,10 +13,10 @@ validator = RequestValidator(settings.TWILIO_AUTH_TOKEN)
 
 
 async def validate_twilio_request(request: Request) -> dict:
-    signature = request.headers.get("X-Twilio-Signature", "")
+    signature = request.headers.get("X-Twilio-Signature")
     form = await request.form()
-    if not validator.validate(str(request.url), dict(form), signature):
-        raise HTTPException(status_code=403, detail="Invalid Twilio signature")
+    if not signature or not validator.validate(str(request.url), dict(form), signature):
+        raise HTTPException(status_code=401, detail="Invalid Twilio signature")
     return dict(form)
 
 
@@ -34,7 +34,7 @@ def ready() -> dict:
 def process_call(payload: CallPayload, x_service_token: str | None = Header(None)) -> Response:
     if x_service_token != settings.SERVICE_AUTH_TOKEN:
         raise HTTPException(status_code=401, detail="Unauthorized")
-    twiml = build_initial_twiml(payload.dict())
+    twiml = build_initial_twiml(payload.model_dump())
     return Response(content=twiml, media_type="application/xml")
 
 
