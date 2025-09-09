@@ -6,8 +6,14 @@ from twilio.request_validator import RequestValidator
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 os.environ.setdefault("SERVICE_AUTH_TOKEN", "test-token")
+
 os.environ.setdefault("TWILIO_SID", "test-twilio-sid")
 os.environ.setdefault("TWILIO_TOKEN", "test-twilio-token")
+
+
+os.environ.setdefault("PYTHON_VOICE_TOKEN", "test-voice-token")
+os.environ.setdefault("PYTHON_SMS_TOKEN", "test-sms-token")
+
 
 from main import app
 
