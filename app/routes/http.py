@@ -32,7 +32,7 @@ def ready() -> dict:
 
 @router.post("/process-call")
 def process_call(payload: CallPayload, x_service_token: str | None = Header(None)) -> Response:
-    if x_service_token != settings.SERVICE_AUTH_TOKEN:
+    if x_service_token != settings.PYTHON_VOICE_TOKEN:
         raise HTTPException(status_code=401, detail="Unauthorized")
     twiml = build_initial_twiml(payload.model_dump())
     return Response(content=twiml, media_type="application/xml")
