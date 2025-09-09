@@ -9,15 +9,18 @@ from app.services.transcription import transcribe_audio
 
 
 router = APIRouter()
-validator = RequestValidator(settings.TWILIO_AUTH_TOKEN)
+validator = RequestValidator(settings.TWILIO_TOKEN)
 
 
 async def validate_twilio_request(request: Request) -> dict:
     signature = request.headers.get("X-Twilio-Signature")
     form = await request.form()
-    if not signature or not validator.validate(str(request.url), dict(form), signature):
+    data = dict(form)
+    if data.get("AccountSid") != settings.TWILIO_SID:
+        raise HTTPException(status_code=401, detail="Invalid Twilio account")
+    if not signature or not validator.validate(str(request.url), data, signature):
         raise HTTPException(status_code=401, detail="Invalid Twilio signature")
-    return dict(form)
+    return data
 
 
 @router.get("/health")

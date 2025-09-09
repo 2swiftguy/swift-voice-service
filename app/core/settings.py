@@ -2,9 +2,12 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     SERVICE_AUTH_TOKEN: str
-    TWILIO_AUTH_TOKEN: str
+
+    TWILIO_SID: str
+
     PYTHON_VOICE_TOKEN: str
     PYTHON_SMS_TOKEN: str
+
     OPENAI_API_KEY: str | None = None
     REDIS_URL: str = "redis://localhost:6379/0"
     ENV: str = "local"
