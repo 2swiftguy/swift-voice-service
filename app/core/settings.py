@@ -1,8 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    SERVICE_AUTH_TOKEN: str
-
     TWILIO_SID: str
     TWILIO_TOKEN: str
 

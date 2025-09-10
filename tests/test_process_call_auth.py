@@ -7,8 +7,6 @@ from fastapi.testclient import TestClient
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 # Ensure required environment variables are set for settings
-os.environ.setdefault("SERVICE_AUTH_TOKEN", "test-token")
-
 os.environ.setdefault("TWILIO_SID", "test-twilio-sid")
 os.environ.setdefault("TWILIO_TOKEN", "test-twilio-token")
 
