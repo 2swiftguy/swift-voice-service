@@ -53,7 +53,7 @@ async def transcribe(request: Request) -> Response:
         data = await audio.read() if hasattr(audio, "read") else audio
         text = transcribe_audio(data)
 
-    twiml = build_transcribe_twiml({"SpeechResult": text})
+    twiml = build_transcribe_twiml({"speech_result": text})
 
     return Response(content=twiml, media_type="application/xml")
 

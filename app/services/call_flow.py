@@ -4,7 +4,7 @@ from twilio.twiml.voice_response import VoiceResponse
 
 
 def build_initial_twiml(payload: dict) -> str:
-    sid = payload.get("CallSid") or ""
+    sid = payload.get("call_sid") or ""
     set_state(sid, stage="gather")
 
     base = settings.PUBLIC_BASE_URL or ""
@@ -32,7 +32,7 @@ def build_initial_twiml(payload: dict) -> str:
 
 
 def build_transcribe_twiml(payload: dict) -> str:
-    text = payload.get("SpeechResult") or ""
+    text = payload.get("speech_result") or ""
     response = VoiceResponse()
     response.say(f"You said: {text}", voice="Polly.Matthew")
     response.hangup()
