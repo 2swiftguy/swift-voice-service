@@ -4,6 +4,7 @@ class Settings(BaseSettings):
     SERVICE_AUTH_TOKEN: str
 
     TWILIO_SID: str
+    TWILIO_TOKEN: str
 
     PYTHON_VOICE_TOKEN: str
     PYTHON_SMS_TOKEN: str
