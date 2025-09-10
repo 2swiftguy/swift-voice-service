@@ -1,8 +1,12 @@
+
 import contextvars
+
 import logging
 import uuid
 
 from starlette.middleware.base import BaseHTTPMiddleware
+
+
 
 
 # Context variable to store the current request ID
@@ -21,6 +25,7 @@ class RequestIdFilter(logging.Filter):
 _root_logger = logging.getLogger()
 if not any(isinstance(f, RequestIdFilter) for f in _root_logger.filters):
     _root_logger.addFilter(RequestIdFilter())
+
 
 
 class RequestIdMiddleware(BaseHTTPMiddleware):
