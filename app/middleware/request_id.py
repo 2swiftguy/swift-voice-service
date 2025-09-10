@@ -1,5 +1,9 @@
+import logging
+import uuid
+
 from starlette.middleware.base import BaseHTTPMiddleware
-import uuid, logging
+
+
 class RequestIdMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
         rid = request.headers.get("X-Request-ID", str(uuid.uuid4()))
