@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 class Settings(BaseSettings):
     TWILIO_SID: str
     TWILIO_TOKEN: str
@@ -11,7 +12,10 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379/0"
     ENV: str = "local"
     PUBLIC_BASE_URL: str | None = None
+    WORKER_TIMEOUT_SECONDS: float = 8.0
+    STREAMING_SESSION_TTL_SECONDS: int = 3600
 
     model_config = SettingsConfigDict(env_file=".env.local", env_file_encoding="utf-8", extra="ignore")
+
 
 settings = Settings()
