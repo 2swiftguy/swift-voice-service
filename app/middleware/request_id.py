@@ -1,41 +1,32 @@
-
 import contextvars
-
 import logging
 import uuid
 
 from starlette.middleware.base import BaseHTTPMiddleware
 
 
+trace_id_ctx: contextvars.ContextVar[str] = contextvars.ContextVar("trace_id", default="")
 
 
-# Context variable to store the current request ID
-_request_id_ctx: contextvars.ContextVar[str] = contextvars.ContextVar("request_id", default="")
-
-
-class RequestIdFilter(logging.Filter):
-    """Logging filter that injects the current request ID into log records."""
-
+class TraceIdFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:  # pragma: no cover - trivial
-        record.request_id = _request_id_ctx.get()
+        record.trace_id = trace_id_ctx.get()
         return True
 
 
-# Attach the filter once to the root logger
 _root_logger = logging.getLogger()
-if not any(isinstance(f, RequestIdFilter) for f in _root_logger.filters):
-    _root_logger.addFilter(RequestIdFilter())
-
+if not any(isinstance(f, TraceIdFilter) for f in _root_logger.filters):
+    _root_logger.addFilter(TraceIdFilter())
 
 
 class RequestIdMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
-        rid = request.headers.get("X-Request-ID", str(uuid.uuid4()))
-        token = _request_id_ctx.set(rid)
+        trace_id = request.headers.get("X-Trace-Id") or str(uuid.uuid4())
+        request.state.trace_id = trace_id
+        token = trace_id_ctx.set(trace_id)
         try:
-            resp = await call_next(request)
+            response = await call_next(request)
         finally:
-            _request_id_ctx.reset(token)
-        resp.headers["X-Request-ID"] = rid
-        return resp
-
+            trace_id_ctx.reset(token)
+        response.headers["X-Trace-Id"] = trace_id
+        return response
