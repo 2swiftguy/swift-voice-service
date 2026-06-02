@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, Header, HTTPException
+from fastapi import APIRouter, Depends
 
-from app.core.settings import settings
+from app.core.auth import require_voice_token
 from app.models.api_v1 import (
     ClassifyIntentRequestV1,
     ClassifyIntentResponseV1,
@@ -19,11 +19,6 @@ from app.services.ai_worker import classify_intent, generate_reply
 from app.services.streaming_sessions import create_streaming_session, update_partial
 
 router = APIRouter(prefix="/v1", tags=["v1"])
-
-
-def require_voice_token(x_service_token: str | None = Header(None)) -> None:
-    if x_service_token != settings.PYTHON_VOICE_TOKEN:
-        raise HTTPException(status_code=401, detail="Unauthorized")
 
 
 @router.post("/transcribe", response_model=TranscribeResponseV1)

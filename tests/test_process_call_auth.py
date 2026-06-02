@@ -27,5 +27,29 @@ def test_process_call_without_token_returns_401():
 
 def test_process_call_with_token_returns_200():
     token = os.environ["PYTHON_VOICE_TOKEN"]
-    response = client.post("/process-call", headers={"X-Service-Token": token}, json={})
+    response = client.post(
+        "/process-call",
+        headers={"X-Service-Token": token, "X-Trace-Id": "trace-voice"},
+        json={
+            "from": "+15550001111",
+            "to": "+15550002222",
+            "call_sid": "CA123",
+            "trace_id": "trace-voice",
+        },
+    )
     assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/xml")
+
+
+def test_process_call_validation_error_matches_laravel_contract():
+    token = os.environ["PYTHON_VOICE_TOKEN"]
+    response = client.post(
+        "/process-call",
+        headers={"X-Service-Token": token, "X-Trace-Id": "trace-voice"},
+        json={"from": "+15550001111"},
+    )
+
+    assert response.status_code == 400
+    assert response.json()["error"]["code"] == "validation_error"
+    assert response.json()["error"]["message"] == "Invalid voice payload"
+    assert response.json()["error"]["trace_id"] == "trace-voice"

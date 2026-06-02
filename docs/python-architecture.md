@@ -13,6 +13,10 @@
 - Deprecated compatibility routes may continue being used unless migration path is explicit.
 
 ## Target shape
+- Laravel-facing contract routes:
+  - `POST /process-call`
+  - `POST /process-sms`
+  - Both accept strict snake_case JSON payloads from `2swiftguy/haroldhowell`, require `X-Service-Token`, and return TwiML as `text/xml`.
 - Public API surface (v1):
   - `POST /v1/transcribe`
   - `POST /v1/classify-intent`
@@ -21,7 +25,7 @@
   - `GET /ready`
   - Streaming routes: `POST /v1/streaming/sessions`, `POST /v1/streaming/partial`
 - Legacy routes remain for compatibility, but return deprecation warnings so clients can migrate safely.
-- All JSON request and response bodies are represented by strict Pydantic v1 models (`*V1` types).
+- All JSON request and response bodies are represented by strict Pydantic models (`*V1` and contract types).
 - Service remains stateless:
   - No persistent in-memory state.
   - Streaming metadata is stored in Redis with TTL.

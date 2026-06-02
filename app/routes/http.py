@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Header, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse, Response
+from pydantic import ValidationError
 from twilio.request_validator import RequestValidator
 
+from app.core.auth import require_voice_token
 from app.core.settings import settings
-from app.models.call import CallPayload
+from app.models.contracts import ErrorEnvelope, ErrorPayload, VoiceRequest
 from app.services.call_flow import build_initial_twiml, build_transcribe_twiml
 from app.services.transcription import transcribe_audio
 
@@ -11,6 +13,19 @@ from app.services.transcription import transcribe_audio
 router = APIRouter(tags=["legacy"])
 validator = RequestValidator(settings.TWILIO_TOKEN)
 DEPRECATION_MSG = "Deprecated endpoint; migrate to /v1/* routes"
+
+
+def validation_error_response(message: str, request: Request, exc: ValidationError) -> JSONResponse:
+    envelope = ErrorEnvelope(
+        error=ErrorPayload(
+            code="validation_error",
+            message=message,
+            trace_id=request.headers.get("X-Trace-Id"),
+            retryable=False,
+            details={"errors": exc.errors()},
+        )
+    )
+    return JSONResponse(content=envelope.model_dump(), status_code=400)
 
 
 async def validate_twilio_request(request: Request) -> dict:
@@ -25,13 +40,16 @@ async def validate_twilio_request(request: Request) -> dict:
 
 
 @router.post("/process-call")
-def process_call(payload: CallPayload, x_service_token: str | None = Header(None)) -> Response:
-    if x_service_token != settings.PYTHON_VOICE_TOKEN:
-        raise HTTPException(status_code=401, detail="Unauthorized")
-    twiml = build_initial_twiml(payload.model_dump())
+def process_call(payload: dict, request: Request, _: None = Depends(require_voice_token)) -> Response:
+    try:
+        data = VoiceRequest.model_validate(payload)
+    except ValidationError as exc:
+        return validation_error_response("Invalid voice payload", request, exc)
+
+    twiml = build_initial_twiml(data.model_dump())
     return Response(
         content=twiml,
-        media_type="application/xml",
+        media_type="text/xml",
         headers={"Warning": f'299 - "{DEPRECATION_MSG}"'},
     )
 
