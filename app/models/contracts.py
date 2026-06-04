@@ -18,6 +18,7 @@ class VoiceRequest(ContractModel):
     to: str
     call_sid: str
     trace_id: str
+    public_base_url: str | None = None
 
 
 class ErrorPayload(BaseModel):

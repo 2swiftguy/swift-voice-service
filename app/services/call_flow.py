@@ -7,13 +7,14 @@ def build_initial_twiml(payload: dict) -> str:
     sid = payload.get("call_sid") or ""
     set_state(sid, stage="gather")
 
-    base = settings.PUBLIC_BASE_URL or ""
+    base = (payload.get("public_base_url") or settings.PUBLIC_BASE_URL or "").rstrip("/")
     partial_cb = f"{base}/partial" if base else ""
+    action_url = f"{base}/transcribe" if base else ""
 
     response = VoiceResponse()
     gather_kwargs = {
         "input": "speech dtmf",
-        "action": "/transcribe",
+        "action": action_url,
         "method": "POST",
         "speech_timeout": "auto",
         "barge_in": True,
@@ -32,7 +33,7 @@ def build_initial_twiml(payload: dict) -> str:
 
 
 def build_transcribe_twiml(payload: dict) -> str:
-    text = payload.get("speech_result") or ""
+    text = payload.get("SpeechResult") or payload.get("speech_result") or ""
     response = VoiceResponse()
     response.say(f"You said: {text}", voice="Polly.Matthew")
     response.hangup()
